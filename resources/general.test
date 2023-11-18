@@ -1,0 +1,78 @@
+test_command:
+  command: "echo 'Hello, World!'"
+  stdout: "./logs/test_command_output.log"
+  stderr: "./logs/test_command_error.log"
+  autostart: true
+
+test_num_instances:
+  command: "sleep 60"
+  stdout: "./logs/test_num_instances_output.log"
+  stderr: "./logs/test_num_instances_error.log"
+  num_instances: 2
+  autostart: true
+
+test_autostart:
+  command: "sleep 60"
+  stdout: "./logs/test_autostart_output.log"
+  stderr: "./logs/test_autostart_error.log"
+  autostart: true
+
+test_restart_policy:
+  command: "exit 1"
+  stdout: "./logs/test_restart_policy_output.log"
+  stderr: "./logs/test_restart_policy_error.log"
+  restart_policy: "unexpected"
+  exitcodes: [0]
+  autostart: true
+
+test_exitcodes:
+  command: "exit 0"
+  stdout: "./logs/test_exitcodes_output.log"
+  stderr: "./logs/test_exitcodes_error.log"
+  exitcodes: [0]
+  autostart: true
+  max_restarts: 1
+
+test_successful_start_time:
+  command: "sleep 5 && exit 1"
+  stdout: "./logs/test_successful_start_time_output.log"
+  stderr: "./logs/test_successful_start_time_error.log"
+  successful_start_time: 3
+  autostart: true
+  restart_policy: "unexpected"
+
+test_max_restarts:
+  command: "exit 1"
+  stdout: "./logs/test_max_restarts_output.log"
+  stderr: "./logs/test_max_restarts_error.log"
+  max_restarts: 2
+  restart_policy: "always"
+  autostart: true
+
+test_stop_signal:
+  command: "trap 'echo caught' SIGUSR1; sleep 60"
+  stdout: "./logs/test_stop_signal_output.log"
+  stderr: "./logs/test_stop_signal_error.log"
+  stop_signal: 10  # SIGUSR1
+  autostart: true
+
+test_graceful_stop_timeout:
+  command: "sleep 60"
+  stdout: "./logs/test_graceful_stop_timeout_output.log"
+  stderr: "./logs/test_graceful_stop_timeout_error.log"
+  graceful_stop_timeout: 5
+  autostart: true
+
+test_output_redirection:
+  command: "echo 'Hello, stdout'; echo 'Hello, stderr' >&2"
+  stdout: "./logs/test_output_redirection_output.log"
+  stderr: "./logs/test_output_redirection_error.log"
+  autostart: true
+
+test_env_vars:
+  command: "echo $TEST_VAR"
+  stdout: "./logs/test_env_vars_output.log"
+  stderr: "./logs/test_env_vars_error.log"
+  env:
+    TEST_VAR: "Value1"
+  autostart: true

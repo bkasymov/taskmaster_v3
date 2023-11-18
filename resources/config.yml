@@ -1,0 +1,120 @@
+test_ls:
+  command: "ls -l ~/"
+  stdout: "logs/test_ls_output.log"
+  stderr: "logs/test_ls_error.log"
+  workingdir: "~"
+  autostart: true
+  env:
+    ENV_VAR1: "Value1"
+    ENV_VAR2: "Value2"
+  graceful_stop_timeout: 5
+  max_restarts: 3
+  restart_policy: "unexpected"
+  num_instances: 1
+  exitcodes:
+    - 0
+    - 1
+  successful_start_time: 1
+  stop_signal: 15  # SIGTERM
+
+test_echo:
+  command: "echo 'Hello, World!'"
+  stdout: "logs/test_echo_output.log"
+  stderr: "logs/test_echo_error.log"
+  autostart: false
+  max_restarts: 1
+  restart_policy: "always"
+  num_instances: 2
+  exitcodes:
+    - 0
+  successful_start_time: 1
+  stop_signal: 15
+
+test_failure:
+  command: "cat nonexistentfile.txt"
+  stderr: "logs/test_failure_error.log"
+  autostart: true
+  max_restarts: 2
+  restart_policy: "unexpected"
+  num_instances: 1
+  exitcodes:
+    - 0
+  successful_start_time: 1
+  stop_signal: 15
+
+test_sleep:
+  command: "sleep 30 && echo 'Sleep finished'"
+  stdout: "logs/test_sleep_output.log"
+  autostart: true
+  max_restarts: 1
+  restart_policy: "never"
+  num_instances: 1
+  exitcodes:
+    - 0
+  successful_start_time: 5
+  stop_signal: 15
+
+
+test_interval_echo:
+  command: "while true; do echo 'Hello every 10 seconds'; sleep 10; done"
+  stdout: "logs/test_interval_echo_output.log"
+  autostart: false
+  max_restarts: 3
+  restart_policy: "always"
+  num_instances: 1
+  exitcodes:
+    - 0
+  successful_start_time: 2
+  stop_signal: 15
+
+
+test_error_exit:
+  command: "ls non_existent_directory"
+  stderr: "logs/test_error_exit_error.log"
+  autostart: true
+  max_restarts: 1
+  restart_policy: "unexpected"
+  num_instances: 1
+  exitcodes:
+    - 0
+  successful_start_time: 1
+  stop_signal: 15
+
+test_env_vars:
+  command: "sleep 10000 && echo $TEST_VAR"
+  stdout: "logs/test_env_vars_output.log"
+  autostart: true
+  env:
+    TEST_VAR: "Hello from Environment Variable"
+  max_restarts: 0
+  restart_policy: "never"
+  num_instances: 1
+  exitcodes:
+    - 0
+  successful_start_time: 1
+  stop_signal: 15
+
+
+test_long_running:
+  command: "sleep 3600"  # Процесс будет "спать" в течение 1 часа (3600 секунд)
+  autostart: true
+  max_restarts: 0
+  restart_policy: "never"
+  num_instances: 1
+  exitcodes:
+    - 0
+  successful_start_time: 10
+  stop_signal: 15
+
+test_echo2:
+  command: "echo 'Hello, Bekhruz!'"
+  stdout: "logs/test_echo_output.log"
+  stderr: "logs/test_echo_error.log"
+  autostart: false
+  max_restarts: 1
+  restart_policy: "always"
+  num_instances: 2
+  exitcodes:
+    - 0
+  successful_start_time: 1
+  stop_signal: 15

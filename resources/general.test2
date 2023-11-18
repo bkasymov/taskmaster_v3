@@ -1,0 +1,77 @@
+test_command:
+  command: "echo 'Command test passed'"
+  stdout: "./logs/test_command_output.log"
+  stderr: "./logs/test_command_error.log"
+
+test_num_instances:
+  command: "echo 'Multiple instances test passed'"
+  stdout: "./logs/test_num_instances_output.log"
+  stderr: "./logs/test_num_instances_error.log"
+  num_instances: 2
+
+test_autostart:
+  command: "echo 'Autostart test passed'"
+  stdout: "./logs/test_autostart_output.log"
+  stderr: "./logs/test_autostart_error.log"
+  autostart: true
+
+test_restart_policy:
+  command: "echo 'Restart policy test' && exit 1"
+  stdout: "./logs/test_restart_policy_output.log"
+  stderr: "./logs/test_restart_policy_error.log"
+  restart_policy: "unexpected"
+  exitcodes: [0]
+
+test_exitcodes:
+  command: "echo 'Exit code test' && exit 0"
+  stdout: "./logs/test_exitcodes_output.log"
+  stderr: "./logs/test_exitcodes_error.log"
+  exitcodes: [0]
+  max_restarts: 1
+
+test_successful_start_time:
+  command: "sleep 5 && echo 'Successful start time test' && exit 1"
+  stdout: "./logs/test_successful_start_time_output.log"
+  stderr: "./logs/test_successful_start_time_error.log"
+  successful_start_time: 3
+  restart_policy: "unexpected"
+
+test_successful_start_time:
+  command: "sleep 5 && echo 'Successful start time test' && exit 1"
+  stdout: "./logs/test_successful_start_time_output.log"
+  stderr: "./logs/test_successful_start_time_error.log"
+  successful_start_time: 3
+  autostart: true
+  restart_policy: "unexpected"
+
+test_max_restarts:
+  command: "echo 'Max restarts test' && exit 1"
+  stdout: "./logs/test_max_restarts_output.log"
+  stderr: "./logs/test_max_restarts_error.log"
+  max_restarts: 2
+  restart_policy: "always"
+
+test_stop_signal:
+  command: "trap 'echo SIGUSR1 caught' SIGUSR1; sleep 60"
+  stdout: "./logs/test_stop_signal_output.log"
+  stderr: "./logs/test_stop_signal_error.log"
+  stop_signal: 10  # SIGUSR1
+  autostart: true
+
+test_graceful_stop_timeout:
+  command: "trap 'echo Graceful stop occurred' SIGTERM; sleep 60; echo Process completed normally"
+  stdout: "./logs/test_graceful_stop_timeout_output.log"
+  stderr: "./logs/test_graceful_stop_timeout_error.log"
+  graceful_stop_timeout: 5
+  autostart: true
+
+
+test_output_redirection:
+  command: "echo 'Hello, stdout'; echo 'Hello, stderr' >&2"
+  stdout: "./logs/test_output_redirection_output.log"
+  stderr: "./logs/test_output_redirection_error.log"
+  autostart: true
+
+test_env_vars:
+  command: "echo 'Environment variable TEST_VAR is $TEST_VAR'"
+
