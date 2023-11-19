@@ -54,7 +54,7 @@ class TaskmasterShell(cmd.Cmd):
         process = self.processes.get(name)
         if process:
             uptime = self._get_process_uptime(process)
-            print(f"{name:20} Status: {process.status:10}") # Uptime: {uptime:15}
+            print(f"{name:30} Status: {process.status:10}") # Uptime: {uptime:15}
         else:
             print(f"{name:20} Status: {'Not found':10}")# Uptime: {'N/A':15}
 
@@ -114,3 +114,22 @@ class TaskmasterShell(cmd.Cmd):
                 break  # Выход из цикла после завершения cmdloop
             except KeyboardInterrupt:
                 print("\nОперация прервана. Введите 'exit' для выхода.")
+
+    def do_show(self, arg):
+        """Show details of a process: show <name>"""
+        process = self.processes.get(arg)
+        if process:
+            self._show_process_details(process)
+        else:
+            print(f"Process {arg} not found.")
+
+    def _show_process_details(self, process):
+        """Выводит подробные характеристики процесса."""
+        print(f"Process Name: {process.name}")
+        print(f"Status: {process.status}")
+        if process.status == "RUNNING":
+            uptime = self._get_process_uptime(process)
+            print(f"Uptime: {uptime}")
+        print("Configuration:")
+        for key, value in process.config.items():
+            print(f"  {key}: {value}")

@@ -393,3 +393,66 @@
 2023-11-18 08:36:18,933 - INFO - Process test_graceful_stop_timeout stopped.
 2023-11-18 08:36:18,933 - INFO - Process test_output_redirection stopped.
 2023-11-18 08:36:18,933 - INFO - Process test_env_vars stopped.
+2023-11-19 03:16:51,522 - INFO - Process test_autostart is starting.
+2023-11-19 03:16:51,529 - INFO - Process test_successful_start_time is starting.
+2023-11-19 03:16:51,535 - INFO - Process test_stop_signal is starting.
+2023-11-19 03:16:51,541 - INFO - Process test_graceful_stop_timeout is starting.
+2023-11-19 03:16:51,549 - INFO - Process test_output_redirection is starting.
+2023-11-19 03:18:18,055 - INFO - Process test_autostart is starting.
+2023-11-19 03:18:18,061 - INFO - Process test_successful_start_time is starting.
+2023-11-19 03:18:18,067 - INFO - Process test_stop_signal is starting.
+2023-11-19 03:18:18,073 - INFO - Process test_graceful_stop_timeout is starting.
+2023-11-19 03:18:18,080 - INFO - Process test_output_redirection is starting.
+2023-11-19 03:18:31,864 - INFO - Process test_command is starting.
+2023-11-19 03:19:50,180 - INFO - Process test_command stopped.
+2023-11-19 03:19:57,005 - INFO - Process test_command stopped.
+2023-11-19 03:19:57,005 - INFO - Process test_num_instances stopped.
+2023-11-19 03:19:57,005 - INFO - Process test_autostart stopped.
+2023-11-19 03:19:57,005 - INFO - Process test_restart_policy stopped.
+2023-11-19 03:19:57,006 - INFO - Process test_exitcodes stopped.
+2023-11-19 03:19:57,006 - INFO - Process test_successful_start_time stopped.
+2023-11-19 03:19:57,006 - INFO - Process test_max_restarts stopped.
+2023-11-19 03:19:57,006 - INFO - Process test_stop_signal stopped.
+2023-11-19 03:19:57,006 - INFO - Process test_graceful_stop_timeout stopped.
+2023-11-19 03:19:57,006 - INFO - Process test_output_redirection stopped.
+2023-11-19 03:19:57,006 - INFO - Process test_env_vars stopped.
+2023-11-19 03:20:10,388 - INFO - Process test_autostart is starting.
+2023-11-19 03:20:10,394 - INFO - Process test_successful_start_time is starting.
+2023-11-19 03:20:10,400 - INFO - Process test_stop_signal is starting.
+2023-11-19 03:20:10,407 - INFO - Process test_graceful_stop_timeout is starting.
+2023-11-19 03:20:10,414 - INFO - Process test_output_redirection is starting.
+2023-11-19 03:20:20,969 - INFO - Process test_command is starting.
+2023-11-19 03:20:32,421 - INFO - Process test_command stopped.
+2023-11-19 03:20:32,421 - INFO - Process test_num_instances stopped.
+2023-11-19 03:20:32,421 - INFO - Process test_autostart stopped.
+2023-11-19 03:20:32,422 - INFO - Process test_restart_policy stopped.
+2023-11-19 03:20:32,422 - INFO - Process test_exitcodes stopped.
+2023-11-19 03:20:32,422 - INFO - Process test_successful_start_time stopped.
+2023-11-19 03:20:32,422 - INFO - Process test_max_restarts stopped.
+2023-11-19 03:20:32,422 - INFO - Process test_stop_signal stopped.
+2023-11-19 03:20:32,422 - INFO - Process test_graceful_stop_timeout stopped.
+2023-11-19 03:20:32,422 - INFO - Process test_output_redirection stopped.
+2023-11-19 03:20:32,422 - INFO - Process test_env_vars stopped.
+2023-11-19 03:21:12,773 - INFO - Process test_command is starting.
+2023-11-19 03:21:12,779 - INFO - Process test_autostart is starting.
+2023-11-19 03:21:12,785 - INFO - Process test_successful_start_time is starting.
+2023-11-19 03:21:12,791 - INFO - Process test_stop_signal is starting.
+2023-11-19 03:21:12,797 - INFO - Process test_graceful_stop_timeout is starting.
+2023-11-19 03:21:12,804 - INFO - Process test_output_redirection is starting.
+2023-11-19 03:21:21,670 - INFO - Process test_command stopped.
+2023-11-19 03:21:21,671 - INFO - Process test_num_instances stopped.
+2023-11-19 03:21:21,671 - INFO - Process test_autostart stopped.
+2023-11-19 03:21:21,671 - INFO - Process test_restart_policy stopped.
+2023-11-19 03:21:21,671 - INFO - Process test_exitcodes stopped.
+2023-11-19 03:21:21,671 - INFO - Process test_successful_start_time stopped.
+2023-11-19 03:21:21,671 - INFO - Process test_max_restarts stopped.
+2023-11-19 03:21:21,671 - INFO - Process test_stop_signal stopped.
+2023-11-19 03:21:21,672 - INFO - Process test_graceful_stop_timeout stopped.
+2023-11-19 03:21:21,672 - INFO - Process test_output_redirection stopped.
+2023-11-19 03:21:21,672 - INFO - Process test_env_vars stopped.
+2023-11-19 03:25:40,394 - INFO - Process test_command is starting.
+2023-11-19 03:25:40,401 - INFO - Process test_autostart is starting.
+2023-11-19 03:25:40,408 - INFO - Process test_successful_start_time is starting.
+2023-11-19 03:25:40,418 - INFO - Process test_stop_signal is starting.
+2023-11-19 03:25:40,426 - INFO - Process test_graceful_stop_timeout is starting.
+2023-11-19 03:25:40,435 - INFO - Process test_output_redirection is starting.

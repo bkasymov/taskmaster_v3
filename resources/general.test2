@@ -2,6 +2,7 @@ test_command:
   command: "echo 'Command test passed'"
   stdout: "./logs/test_command_output.log"
   stderr: "./logs/test_command_error.log"
+  autostart: true
 
 test_num_instances:
   command: "echo 'Multiple instances test passed'"
