@@ -1,24 +1,26 @@
-import yaml
+from parse_configs import parse_config
+from create_processes import create_processes
 
-from configs import setup_logging, reload_config, load_config
-from parser import validate_config, initialize_processes
-from process import Process
-from taskmastershell import TaskmasterShell
+
+def drop_privileges():
+    import os
+    import pwd
+    import grp
+
+    uid = pwd.getpwnam("nobody").pw_uid
+    gid = grp.getgrnam("nogroup").gr_gid
+    os.setgid(gid)
+    os.setuid(uid)
+
+    os.umask(0o77)
 
 
 def main():
-    setup_logging()
-    config_path = 'resources/general.test2'  # Путь к конфигурационному файлу
-    config = load_config(config_path)
-    if validate_config(config):
-        print("Configuration loaded.")
-    processes = initialize_processes(config)  # Инициализация процессов
-    shell = TaskmasterShell(processes)
-
-    # Добавление функции перезагрузки конфигурации в шелл
-    shell.do_reload = lambda arg: reload_config(shell, config_path)
-    shell.cmdloop()
+    configurations = parse_config()
+    create_processes(configurations)
+    drop_privileges() # bonus
 
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
