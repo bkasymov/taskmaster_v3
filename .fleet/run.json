@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "python",
+            "name": "Python configuration",
+            "file": "taskmaster/taskmaster/main.py",
+            "arguments": ["taskmaster/resources/config.yml"],
+        },
+        
+    ]
+}

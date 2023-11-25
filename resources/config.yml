@@ -1,7 +1,7 @@
 ping_service:
   command: "ping google.com"
-  num_instances: 1
-  autostart: true
+  numprocs: 2
+  autostart: false
   restart_policy: "unexpected"
   exitcodes: [0]
   successful_start_time: 5
@@ -18,8 +18,8 @@ ping_service:
 
 ping_service2:
   command: "ping google.com"
-  num_instances: 1
-  autostart: true
+  numprocs: 1
+  autostart: false
   restart_policy: "unexpected"
   exitcodes: [0]
   successful_start_time: 5

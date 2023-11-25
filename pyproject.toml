@@ -1,17 +1,16 @@
 [tool.poetry]
-name = "pythonproject1"
+name = "environment"
 version = "0.1.0"
 description = ""
-authors = ["Бехруз Касымов <behaqosimi@gmail.com>"]
+authors = ["dpenney"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
+pyaml = "^23.9.7"
 pyyaml = "^6.0.1"
-processmanager = "^0.1.1"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-

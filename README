@@ -3,3 +3,13 @@ command show to see all specificaions of the command
 show <command_name>
 Example: show test_command
 
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python3 get-pip.py --user && python3 -m venv venv
+python3 -m venv venv_name
+venv_name\Scripts\activate
+source venv_name/bin/activate
+
+
+Poetry
+curl -sSL https://install.python-poetry.org | python3 -
+export PATH="/mnt/nfs/homes/dpenney/.local/bin:$PATH"
+poetry --version
