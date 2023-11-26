@@ -30,6 +30,7 @@ class ProcessManager:
         self.processes = [] # • A list of the processes that are currently running
         self.start_time = None # • The time when the program was started
         self.finish_time = None # • The time when the program exited
+        self.status = None # • The current status of the program (STARTING, RUNNING, BACKOFF, STOPPING, STOPPED, EXITED, FATAL, UNKNOWN)
 
         if self.autostart:
             self.start()
@@ -76,6 +77,7 @@ class ProcessManager:
         self._open_io_files()
         self._reset_umask()
         self._create_processes()
+        self.status = "RUNNING"
 
 
     def _print_start_message(self):
