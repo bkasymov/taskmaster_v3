@@ -1,4 +1,4 @@
-ping_service:
+ping:
   command: "ping google.com"
   numprocs: 2
   autostart: false
@@ -30,5 +30,22 @@ ping_service2:
   stderr: "result/ping_service_err.log"
   env:
     PING_COUNT: "4"
+  working_dir: "/tmp"
+  umask: 0o22
+
+ls_service:
+  command: "ls -la"
+  numprocs: 1
+  autostart: false
+  restart_policy: "unexpected"
+  exitcodes: [0]
+  successful_start_time: 5
+  max_restarts: 2
+  stop_signal: 15  # SIGTERM
+  graceful_stop_timeout: 5
+  stdout: "result/ls_service_out.log"
+  stderr: "result/ls_service_err.log"
+  env:
+    LS_OPTIONS: "-la"
   working_dir: "/tmp"
   umask: 0o22

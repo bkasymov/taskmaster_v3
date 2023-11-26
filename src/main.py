@@ -1,10 +1,14 @@
 import logging
 import threading
 from asyncore import loop
+
+import yaml
+
 import CommandHandler
-from parse_configs import parse_config
-from create_processes import create_processes
 import warnings
+
+from ConfigManager import ConfigManager
+
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="asyncore")
 
 all_processes = {}
@@ -27,17 +31,21 @@ def drop_privileges():
     os.umask(0o77)
 
 def main():
-    configurations = parse_config()
-    create_processes(configurations)
-    all_processes = create_processes(configurations)
+
+    # drop_privileges() # bonus
+
+    configmanager = ConfigManager()
+    print(yaml.dump(configmanager.config_data, default_flow_style=False))
+    CommandHandler.all_processes = ConfigManager.create_processes(configmanager.config_data)
+
+
+    print(yaml.dump(CommandHandler.all_processes, default_flow_style=False))
+
 
     threads = threading.Thread(target=loop)
     threads.daemon = True
     threads.start()
     CommandHandler.CommandHandler().cmdloop()
-
-
-   # drop_privileges() # bonus
 
 
 if __name__ == "__main__":
