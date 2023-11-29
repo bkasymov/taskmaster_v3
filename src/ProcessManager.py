@@ -95,6 +95,16 @@ class ProcessManager:
         os.umask(self.old_umask)
 
 
+    def check_returncode(self, process):
+        process.wait()
+        if process.returncode in self.returncodes:
+            logging.info(f"Process {self.name} with pid {process.pid} exited successfully")
+        else:
+            logging.error(f"Process {self.name} with pid {process.pid} exited with error code {process.returncode}")
+
+
+
+
     def _create_processes(self):
         while len(self.processes) < self.numprocs:
             try:
