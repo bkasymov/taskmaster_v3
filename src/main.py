@@ -4,7 +4,7 @@ from asyncore import loop
 
 import yaml
 
-import CommandHandler
+import commandhandler as CommandHandler
 import warnings
 
 from ConfigManager import ConfigManager
@@ -35,17 +35,20 @@ def main():
     # drop_privileges() # bonus
 
     configmanager = ConfigManager()
-    print(yaml.dump(configmanager.config_data, default_flow_style=False))
-    CommandHandler.all_processes = ConfigManager.create_processes(configmanager.config_data)
+    commandeer = CommandHandler.CommandHandler()
 
+    commandeer.all_processes = configmanager.create_processes(configmanager.config_data)
 
-    print(yaml.dump(CommandHandler.all_processes, default_flow_style=False))
+    for process_manager in commandeer.all_processes.values():
+        process_manager.update_process_statuses()
+
+    print(yaml.dump(commandeer.all_processes, default_flow_style=False))
 
 
     threads = threading.Thread(target=loop)
     threads.daemon = True
     threads.start()
-    CommandHandler.CommandHandler().cmdloop()
+    CommandHandler.CommandHandler.cmdloop(commandeer)
 
 # TODO Добавить параллельную проверку статуса выполнения процесса (завершён, завершён с ошибкой ...). Если он завершён, то в статусе показать, что завершен.
 if __name__ == "__main__":

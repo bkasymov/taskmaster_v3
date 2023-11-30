@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 import subprocess
+import threading
 import time
 
 from termcolor import colored
@@ -54,11 +55,13 @@ class ProcessManager:
             process.kill()
             current_time = datetime.datetime.now()
             time_elapsed = current_time - self.start_time
+            self.finish_time = current_time
             hours, remainder = divmod(time_elapsed.total_seconds(), 3600)
             minutes, seconds = divmod(remainder, 60)
             formatted_time = f"{int(hours)}h {int(minutes)}m {int(seconds)}s"
             logging.info(f"Killed {self.name} with pid {process.pid} and worked {formatted_time}")
             print(f"Killed {self.name} with pid {process.pid} and worked {formatted_time}")
+            self.finish_time = current_time
 
 
     def _close_io_files(self):
@@ -66,8 +69,6 @@ class ProcessManager:
             self.stdout.close()
         if self.stderr:
             self.stderr.close()
-
-
 
 
 
@@ -127,23 +128,17 @@ class ProcessManager:
                 print(f"Error starting {self.name}: {e} at {formatted_time}")
                 logging.error(f"Error starting {self.name}: {e} at {formatted_time}")
 
-
-    def status(self):
-        header = "{:<20} {:<10} {:<20} {:<20} {:<20}".format(
-            'Program', 'PID', 'Processes Running', 'Start Time', 'Finish Time'
-        )
-        print(colored(header, 'blue'))  # Заголовок в синем цвете
-        print(colored("-" * len(header), 'green'))  # Разделительная линия в зеленом цвете
-
+    def check_status(self):
         if self.processes:
+            process = self.processes[0]  # get the first process
             program_status = "{:<20} {:<10} {:<20} {:<20} {:<20}".format(
                 self.name,
-                self.processes[0].pid,
+                process.pid,
                 len(self.processes),
                 self.start_time.strftime("%Y-%m-%d %H:%M:%S") if self.start_time else 'N/A',
                 self.finish_time.strftime("%Y-%m-%d %H:%M:%S") if self.finish_time else 'N/A'
             )
-            print(colored(program_status, 'yellow'))  # Статус программы в желтом цвете
+            print(colored(program_status, 'yellow'))  # Status in yellow color
         else:
             program_status = "{:<20} {:<10} {:<20} {:<20} {:<20}".format(
                 self.name,
@@ -152,5 +147,21 @@ class ProcessManager:
                 'N/A',
                 'N/A'
             )
-            print(colored(program_status, 'red'))  # Статус для неактивных программ в красном цвете
+            print(colored(program_status, 'red'))  # Status for inactive programs in red color
 
+
+    def update_process_statuses(self):
+        update_thread = threading.Thread(target=self._update_process_statuses)
+        update_thread.start()
+
+    def _update_process_statuses(self):
+        for process in self.processes:
+            if process.poll() is not None:  # process has terminated
+                self.processes.remove(process)
+                self.finish_time = datetime.datetime.now()
+                self.status = "EXITED"
+                print(f"Process {process.pid} has exited")
+            else:  # process is still running
+                self.status = "RUNNING"
+                print(f"Process {process.pid} is still running")
+        time.sleep(1)  # delay for 1 second

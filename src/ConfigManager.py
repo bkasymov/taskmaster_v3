@@ -2,7 +2,7 @@ import argparse
 import logging
 import sys
 import yaml
-from ProcessManager import ProcessManager
+from processmanager import ProcessManager
 
 class ConfigManager:
     def __init__(self):
