@@ -49,7 +49,6 @@ class ProcessManager:
     import datetime
 
 # FIXME Пересмотреть как убивать процессы
-    # FIXME исправить, чтобы корректно записывалось время отключения процесса для показания на do_status
     def _kill_processes(self):
         for process in self.processes:
             process.kill()

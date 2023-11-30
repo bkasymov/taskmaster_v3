@@ -7,7 +7,7 @@ import yaml
 import commandhandler as CommandHandler
 import warnings
 
-from ConfigManager import ConfigManager
+from configmanager import ConfigManager
 
 warnings.filterwarnings("ignore", category=DeprecationWarning, module="asyncore")
 
@@ -37,10 +37,10 @@ def main():
     configmanager = ConfigManager()
     commandeer = CommandHandler.CommandHandler()
 
-    commandeer.all_processes = configmanager.create_processes(configmanager.config_data)
+    commandeer.all_processes = configmanager.generate_processes_from_data(configmanager.config_data)
 
-    for process_manager in commandeer.all_processes.values():
-        process_manager.update_process_statuses()
+    # for process_manager in commandeer.all_processes.values():
+    #     process_manager.update_process_statuses()
 
     print(yaml.dump(commandeer.all_processes, default_flow_style=False))
 
@@ -51,5 +51,6 @@ def main():
     CommandHandler.CommandHandler.cmdloop(commandeer)
 
 # TODO Добавить параллельную проверку статуса выполнения процесса (завершён, завершён с ошибкой ...). Если он завершён, то в статусе показать, что завершен.
+# TODO Create new class Process for contain all information about created process, because one command could create several processes
 if __name__ == "__main__":
     main()

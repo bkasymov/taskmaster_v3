@@ -1,7 +1,7 @@
 ping:
   command: "ping google.com"
   numprocs: 2
-  autostart: false
+  autostart: true
   restart_policy: "unexpected"
   exitcodes: [0]
   successful_start_time: 5
