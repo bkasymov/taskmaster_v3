@@ -43,13 +43,4 @@ class ConfigManager:
                 logging.error(error_message)
                 raise ValueError(error_message)
 
-    @staticmethod
-    def generate_processes_from_data(config_data):
-        all_processes = {}
-        for process_name in config_data:
-            process = ProcessManager(process_name, config_data[process_name])
-            all_processes[process_name] = process
-        return all_processes
-
-
 
