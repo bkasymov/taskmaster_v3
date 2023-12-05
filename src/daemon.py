@@ -13,7 +13,7 @@ class TaskmasterDaemon:
     def parse_configs(self):
         try:
             self.logger.info("Parsing config file")
-            self.parser = DaemonParser().parse_args()
+            self.parser = DaemonParser().from_command_line()
             self.logger.info("Config file parsed")
         except ConfigParserError as e:
             self.logger.error("Error parsing config file: {}".format(e))
