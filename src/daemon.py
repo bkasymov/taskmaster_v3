@@ -1,8 +1,10 @@
-import logging
+
 import os
 import logging
 from logger import Logger
 from parse_configs import DaemonParser
+from exceptions import ConfigParserError
+
 
 LOGLEVELCONSTANT = getattr(logging, os.environ.get('LOGLEVEL', 'INFO'), logging.INFO)
 
@@ -18,14 +20,15 @@ class TaskmasterDaemon:
     def parse_configs(self):
         try:
             self.logger.info("Parsing config file")
-            self.parser = DaemonParser().from_command_line()
+            self.parser = DaemonParser.from_command_line()
             self.logger.info("Config file parsed")
+            self.logger.success('')
         except ConfigParserError as e:
             self.logger.error("Error parsing config file: {}".format(e))
             exit(-1)
 
     def create_tasks(self):
-        for program in self.parser.programs:
+        for program in self.programs:
             params = copy.deepcode(program_params)
             cmd = params.pop('cmd')
             task = Task(program.name, cmd, **params)

@@ -1,0 +1,19 @@
+programs:
+  ls_regular:
+    cmd: "ls /tmp"
+    numprocs: 3
+    workingdir: /tmp
+    autostart: false
+    autorestart: never
+    starttime: 0
+    stoptime: 2
+    stopsignal: USR1
+    stdout: /tmp/ls_reg.out.log
+
+  ls_root:
+    cmd: "ls -R /"
+    workingdir: /
+    numprocs: 2
+    exitcodes:
+      - 0
+      - -15
