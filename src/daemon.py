@@ -1,9 +1,14 @@
+import logging
+import os
+import logging
+from logger import Logger
+from parse_configs import DaemonParser
 
 LOGLEVELCONSTANT = getattr(logging, os.environ.get('LOGLEVEL', 'INFO'), logging.INFO)
 
 
 class TaskmasterDaemon:
-    def __init__(self, config_file):
+    def __init__(self):
         self.logger = Logger(level=LOGLEVELCONSTANT)
         self.parser = None
         self.programs = []
@@ -52,8 +57,11 @@ class TaskmasterDaemon:
 # TODO названия потом поменяю, сейчас это не критично. Потом рефакторингом быстро одной клавишей поменяю.
 
 if __name__ == '__main__':
+
     taskmaster_daemon = TaskmasterDaemon()
+
     taskmaster_daemon.parse_configs()
+
     taskmaster_daemon.create_tasks()
 
     taskmaster_daemon.manager = Manager(taskmaster_daemon.programs, taskmaster_daemon.parser)
