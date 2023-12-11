@@ -1,12 +1,12 @@
-
+import copy
 import os
 import logging
+import sys
 from logger import Logger
 from parse_configs import DaemonParser
 from exceptions import ConfigParserError
-
-
-LOGLEVELCONSTANT = getattr(logging, os.environ.get('LOGLEVEL', 'INFO'), logging.INFO)
+from tasks import Task
+from constants import LOGLEVELCONSTANT
 
 
 class TaskmasterDaemon:
@@ -20,6 +20,8 @@ class TaskmasterDaemon:
     def parse_configs(self):
         try:
             self.logger.info("Parsing config file")
+            # Сначала вызывается статический метод, а затем создаётся объект DaemonParser сразу же.
+            # Возвращается объект класса DaemonParser
             self.parser = DaemonParser.from_command_line()
             self.logger.info("Config file parsed")
             self.logger.success('')
@@ -27,11 +29,12 @@ class TaskmasterDaemon:
             self.logger.error("Error parsing config file: {}".format(e))
             exit(-1)
 
+#TODO Делаю класс Task
     def create_tasks(self):
-        for program in self.programs:
-            params = copy.deepcode(program_params)
+        for program_name, program_params in self.parser.config['programs'].items():
+            params = copy.deepcopy(program_params)
             cmd = params.pop('cmd')
-            task = Task(program.name, cmd, **params)
+            task = Task(program_name, cmd, **params)
             self.programs.append(task)
         self.logger.info("Programs parsed")
 

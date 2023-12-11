@@ -1,8 +1,12 @@
 import argparse
+
+from exceptions import ParseError
 from logger import Logger
 import logging
 import os
 import sys
+import yaml
+from params_validation import PARAMS_CONSTANTS, _no_check, _to_list
 
 LOGLEVELCONSTANT = getattr(logging, os.environ.get('LOGLEVEL', 'INFO'), logging.INFO)
 
@@ -19,7 +23,7 @@ class DaemonParser:
 
         try:
             with open(self.config_path, 'r') as f:
-                self.config = yaml.safe_load(f, Loader=yaml.FullLoader)
+                self.config = yaml.load(f, Loader=yaml.FullLoader)
             self.logger.debug("Config file loaded")
         except Exception as e:
             self.logger.error("Error parsing config file: {}".format(e))
@@ -39,7 +43,7 @@ class DaemonParser:
             self.logger.warning("No programs found in config file")
             return
 
-        for program_name, params in programs.item():
+        for program_name, params in programs.items():
             self._validate_required_params(program_name, params)
             self._validate_and_transform_params(program_name, params)
 
@@ -57,18 +61,19 @@ class DaemonParser:
 
 
     def _validate_param_exist(self, program_name, param_key):
-        if param_key not in PARAMS:
+        if param_key not in PARAMS_CONSTANTS:
             self.logger.warning("Program `{}` contains unknown param `{}`".format(program_name, param_key))
 
     def _validate_param_type(self, program_name, param_key, param_value):
-        expected_type = PARAMS[param_key]['expected_type']
+        expected_type = _to_list(PARAMS_CONSTANTS[param_key]['expected_type'])
+
         if not isinstance(param_value, tuple(expected_type)):
             actual_type = type(param_value)
             self.logger.error("Program `{}` param `{}` must be `{}`, not `{}`".format(program_name, param_key, expected_type, actual_type))
             raise ParseError("Program `{}` param `{}` must be `{}`, not `{}`".format(program_name, param_key, expected_type, actual_type))
 
     def _apply_param_transformation(self, program_name, param_key, param_value):
-        params_mapping = PARAMS[param_key]
+        params_mapping = PARAMS_CONSTANTS[param_key]
         handler = params_mapping.get('handler', _no_check)
         transform = params_mapping.get('transform')
         args = params_mapping.get('args', [])
