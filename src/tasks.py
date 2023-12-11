@@ -6,6 +6,21 @@ import time
 from constants import LOGLEVELCONSTANT
 from logger import Logger
 
+def handle_process_restart_behavior(process, autorestart, exitcodes, restart_callback):
+    process.wait()
+
+    logger = Logger(level=LOGLEVELCONSTANT)
+    logger.debug(f'Process {process.pid} ({process.args}) exited with returncode {process.returncode}.'
+                 f'Expected exitcodes: {exitcodes}'
+                 f'Autorestart: {autorestart}')
+
+    if autorestart.upper() == 'ALWAYS' or (autorestart.upper() == 'UNEXPECTED' and process.returncode not in exitcodes and '*' not in process.returncode):
+        try:
+            logger.debug(f'Process {process.pid} ({process.args}) will be restarted by callback %s.' % restart_callback.__name__)
+            restart_callback(process)
+            return
+        except Exception as e:
+            logger.error(f'Error in callback: {e} {restart_callback.__name__} with args {process}')
 
 def _nop():
     pass
@@ -38,6 +53,7 @@ class Task:
                stoptime=5, # Задержка перед остановкой
                env = {},
                **kwargs):
+
         self.name = name
         self.cmd = cmd
         self.numprocs = numprocs
@@ -176,6 +192,70 @@ class Task:
             self.stderr = getattr(self.stderr, 'name', '')
 
 
+    @property
+    def stdout(self):
+        return self._stdout
+
+
+    @stdout.setter
+    def stdout(self, path):
+        if not path:
+            self._stdout = subprocess.PIPE
+        else:
+            try:
+                with open(path, 'w') as file:
+                    self._stdout = file
+            except IOError:
+                self.logger.error(f'Can not open {path}')
+                print(f'Can not open {path}')
+                self._stdout = subprocess.PIPE
+
+    @property
+    def stderr(self):
+        return self._stderr
+
+    @stderr.setter
+    def stderr(self, path):
+        if not path:
+            self._stderr = subprocess.PIPE
+        else:
+            try:
+                with open(path, 'w') as file:
+                    self._stderr = file
+            except IOError:
+                self.logger.error(f'Can not open {path}')
+                print(f'Can not open {path}')
+                self._stderr = subprocess.PIPE
+
+#
+    def _initchildproc(self):
+        """
+        Метод, который вызывается перед запуском дочернего процесса для того, чтобы изменить права доступа производных файлов и директорий.
+        аргумент 8 означает, что права доступа будут установлены в 8-ричной системе счисления.
+        :return:
+        """
+        os.umask(int(self.umask, 8))
+
+
+    def define_restart_policy(self, process, retry=False):
+        try:
+            with ThreadPoolExecutor(max_workers=1) as executor:
+                executor.submit(self._handle_restart, process, retry)
+        except Exception as e:
+            self.logger.error(f'Error in thread: {e}')
+
+
+    def _handle_restart(self, process, retry):
+        try:
+            handle_process_restart_behavior(
+                process,
+                self.autorestart,
+                self.exitcodes,
+                lambda *_:
+                    self.restart(retry=retry, from_thread=True),
+            )
+        except Exception as e:
+            self.logger.error(f'Error in thread: {e}')
 
 
 
@@ -217,5 +297,16 @@ class Task:
     def close_fds(self):
         getattr(self.stdout, 'close', _nop)()
         getattr(self.stderr, 'close', _nop)()
+
+
+    def uptime(self):
+        self.update_process_status()
+        if self.start_time == STATUS.NOT_STARTED:
+            return 'Not started'
+        elif self.start_time == STATUS.FINISHED:
+            return 'Finished'
+        elif self.start_time == STATUS.STOPPED:
+            return 'Stopped'
+        uptime = int(time.time() - self.start_time)
 
 
