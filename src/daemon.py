@@ -1,6 +1,7 @@
 import copy
 import os
 import logging
+import signal
 import sys
 from logger import Logger
 from parse_configs import DaemonParser
@@ -29,7 +30,6 @@ class TaskmasterDaemon:
             self.logger.error("Error parsing config file: {}".format(e))
             exit(-1)
 
-#TODO Делаю класс Task
     def create_tasks(self):
         for program_name, program_params in self.parser.config['programs'].items():
             params = copy.deepcopy(program_params)

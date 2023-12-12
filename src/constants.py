@@ -5,6 +5,6 @@ LOGLEVELCONSTANT = getattr(logging, os.environ.get('LOGLEVEL', 'INFO'), logging.
 
 STATUS = {
     'NOT_STARTED': -1,
-    'STOPPED': -3,
     'FINISHED': -2,
+    'STOPPED': -3,
 }

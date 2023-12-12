@@ -2,8 +2,9 @@ import os
 import signal
 import subprocess
 import time
+from concurrent.futures import ThreadPoolExecutor
 
-from constants import LOGLEVELCONSTANT
+from constants import LOGLEVELCONSTANT, STATUS
 from logger import Logger
 
 def handle_process_restart_behavior(process, autorestart, exitcodes, restart_callback):
@@ -28,7 +29,7 @@ class Task:
     def __init__(self, *args, **kwargs):
         self.logger = Logger(level=LOGLEVELCONSTANT)
         self.processes = []
-        self.start_time = -1
+        self.start_time = STATUS.NOT_STARTED
         self.stdout = None
         self.stderr = None
         self.trynum = 1
@@ -138,7 +139,7 @@ class Task:
         if process.returncode in self.exitcodes:
             self.define_restart_policy(process)
             self.logger.success(f'{self.name}: process number {virtual_pid} started. Exited directly, with returncode {process.returncode}')
-            self.start_time = -2
+            self.start_time = STATUS.FINISHED
             self.trynum = 1
             return True
         return False
@@ -268,7 +269,7 @@ class Task:
             self._stop_threads()
         self.processes = list()
         self.threads = list()
-        self.start_time = -3 # Для того, чтобы при следующей проверке is_running процесс запускался заново
+        self.start_time = STATUS.STOPPED # Для того, чтобы при следующей проверке is_running процесс запускался заново
         self.stopping = False
     def _stop_processes(self):
         """Останавливает все процессы, связанные с задачей."""
@@ -299,14 +300,41 @@ class Task:
         getattr(self.stderr, 'close', _nop)()
 
 
+    def update_process_status(self):
+        for process in self.processes:
+            if process.returncode is not None:
+                if process.returncode in self.exitcodes:
+                    self.start_time = STATUS.FINISHED
+                else:
+                    self.start_time = STATUS.STOPPED
+                return
+        if not self.processes or all(process.returncode is None for process in self.processes):
+            self.start_time = STATUS.NOT_STARTED
+
+
     def uptime(self):
         self.update_process_status()
         if self.start_time == STATUS.NOT_STARTED:
             return 'Not started'
-        elif self.start_time == STATUS.FINISHED:
-            return 'Finished'
         elif self.start_time == STATUS.STOPPED:
             return 'Stopped'
+        elif self.start_time == STATUS.FINISHED:
+            return 'Finished'
+
         uptime = int(time.time() - self.start_time)
+        hours, remainder = divmod(uptime, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return f'{hours}:{minutes}:{seconds}'
 
 
+    def send_command(self, command):
+        self.logger.info(f'Send command {command} to {self.name}')
+        if command.upper() == 'RESTART':
+            self.restart()
+        elif command == 'stop':
+            self.stop()
+        elif command == 'start':
+            self.run()
+        else:
+            return 'Unknown command'
+        return 'Command sent'
