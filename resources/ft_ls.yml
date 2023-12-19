@@ -3,12 +3,12 @@ programs:
     cmd: "ls /tmp"
     numprocs: 3
     workingdir: /tmp
-    autostart: false
     autorestart: never
     starttime: 0
     stoptime: 2
     stopsignal: USR1
     stdout: /tmp/ls_reg.out.log
+    stderr: /tmp/ls_reg.err.log
 
   ls_root:
     cmd: "ls -R /"

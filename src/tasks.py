@@ -29,7 +29,7 @@ class Task:
     def __init__(self, *args, **kwargs):
         self.logger = Logger(level=LOGLEVELCONSTANT)
         self.processes = []
-        self.start_time = STATUS.NOT_STARTED
+        self.start_time = STATUS['NOT_STARTED']
         self.stdout = None
         self.stderr = None
         self.trynum = 1
@@ -96,14 +96,17 @@ class Task:
 
         self.reopen_stds()
         self.log_start_attempt()
-
-        try:
-            self.start_processes()
-        except Exception:
-            self.handle_startup_failure()
+        self.start_processes()
+        # try:
+        #     self.start_processes()
+        # except Exception:
+        #     self.handle_startup_failure()
 
     def update_trynum(self, retry):
-        self.trynum = 1 if not retry else (self.trynum + 1)
+        if not retry:
+            self.trynum = 1
+        else:
+            self.trynum += 1
 
     def has_exceeded_retries(self):
         if self.trynum > self.startretries:
@@ -126,7 +129,7 @@ class Task:
                 self.handle_unsuccessful_start(process, virtual_pid)
 
     def start_process(self, virtual_pid):
-        return subprocess.Popen(
+        result = subprocess.Popen(
             self.cmd.split(),
             stderr=self.stderr,
             stdout=self.stdout,
@@ -134,12 +137,13 @@ class Task:
             cwd=self.workingdir,
             preexec_fn=self._initchildproc,
         )
+        return result
 
     def is_successful_start(self, process, virtual_pid):
         if process.returncode in self.exitcodes:
             self.define_restart_policy(process)
             self.logger.success(f'{self.name}: process number {virtual_pid} started. Exited directly, with returncode {process.returncode}')
-            self.start_time = STATUS.FINISHED
+            self.start_time = STATUS['FINISHED']
             self.trynum = 1
             return True
         return False
@@ -269,7 +273,7 @@ class Task:
             self._stop_threads()
         self.processes = list()
         self.threads = list()
-        self.start_time = STATUS.STOPPED # Для того, чтобы при следующей проверке is_running процесс запускался заново
+        self.start_time = STATUS['STOPPED'] # Для того, чтобы при следующей проверке is_running процесс запускался заново
         self.stopping = False
     def _stop_processes(self):
         """Останавливает все процессы, связанные с задачей."""
@@ -304,21 +308,21 @@ class Task:
         for process in self.processes:
             if process.returncode is not None:
                 if process.returncode in self.exitcodes:
-                    self.start_time = STATUS.FINISHED
+                    self.start_time = STATUS['FINISHED']
                 else:
-                    self.start_time = STATUS.STOPPED
+                    self.start_time = STATUS['STOPPED']
                 return
         if not self.processes or all(process.returncode is None for process in self.processes):
-            self.start_time = STATUS.NOT_STARTED
+            self.start_time = STATUS['NOT_STARTED']
 
 
     def uptime(self):
         self.update_process_status()
-        if self.start_time == STATUS.NOT_STARTED:
+        if self.start_time == STATUS['NOT_STARTED']:
             return 'Not started'
-        elif self.start_time == STATUS.STOPPED:
+        elif self.start_time == STATUS['STOPPED']:
             return 'Stopped'
-        elif self.start_time == STATUS.FINISHED:
+        elif self.start_time == STATUS['FINISHED']:
             return 'Finished'
 
         uptime = int(time.time() - self.start_time)
