@@ -4,16 +4,10 @@ programs:
     numprocs: 3
     workingdir: /tmp
     autorestart: never
-    starttime: 0
-    stoptime: 2
-    stopsignal: USR1
-    stdout: /tmp/ls_reg.out.log
-    stderr: /tmp/ls_reg.err.log
+    stdout: ./result/ls_reg.out.log
+    stderr: ./result/ls_reg.err.log
 
   ls_root:
     cmd: "ls -R /"
     workingdir: /
     numprocs: 2
-    exitcodes:
-      - 0
-      - -15

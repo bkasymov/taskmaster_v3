@@ -1,4 +1,4 @@
-#!/Users/dpenney/Study/taskmaster_v3/venv/bin/python3.10
+#!/mnt/nfs/homes/dpenney/taskmaster_v3/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

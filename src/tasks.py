@@ -35,10 +35,10 @@ class Task:
         self.logger = Logger(level=LOGLEVELCONSTANT)
         self.processes = []
         self.start_time = STATUS['NOT_STARTED']
-        self.stdout = None
-        self.stderr = None
+        self.stdout = ""    #FIXME here in process of set value return -1. Because Pycharm has not right to read and write /tmp/
+        self.stderr = ""
         self.trynum = 1
-        self.threads = []
+        self.threads = list()
         self.stopping = False
 
         self.update(*args, **kwargs)
@@ -52,16 +52,17 @@ class Task:
                workingdir=os.getcwd(),
                autostart=True,
                autorestart='unexpected',
-               exitcodes=None,
+               exitcodes=[0],
                startretries=1,
                starttime=5, # Задержка перед запуском
                stopsignal='TERM',
                stoptime=5, # Задержка перед остановкой
-               env = {},
+               env={},
                **kwargs):
 
-        if exitcodes is None:
-            exitcodes = [0]
+
+        self.env = os.environ
+        self.exitcodes = exitcodes
         self.name = name
         self.cmd = cmd
         self.numprocs = numprocs
@@ -79,7 +80,7 @@ class Task:
         for key, value in env.items():
             self.env[key] = str(value)
 
-        self.stdout = kwargs.get('stdout', '')
+        self.stdout = self.stdout + kwargs.get('stdout', '')
         self.stderr = kwargs.get('stderr', '')
 
         if autostart:
@@ -146,7 +147,7 @@ class Task:
     def is_successful_start(self, process, virtual_pid):
         if process.returncode in self.exitcodes:
             self.define_restart_policy(process)
-            self.logger.success(f'{self.name}: process number {virtual_pid} started. Exited directly, with returncode {process.returncode}')
+            self.logger.success(f'{self.name}: process number #{virtual_pid} started. Exited directly, with returncode {process.returncode}')
             self.start_time = STATUS['FINISHED']
             self.trynum = 1
             return True
@@ -160,10 +161,10 @@ class Task:
                 return
         except subprocess.TimeoutExpired:
             self.define_restart_policy(process)
-            self.logger.success(f'{self.name}: process number {virtual_pid} started.')
+            self.logger.success(f'{self.name}: process number {virtual_pid} has started.')
             self.trynum = 1
             return
-        self.logger.info(f'Unexpected returncode {process.returncode}')
+        self.logger.info(f'Unexpected return code {process.returncode}')
         self.restart(retry=True)
 
     def handle_startup_failure(self):
