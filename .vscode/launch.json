@@ -5,8 +5,8 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "args": ["--config_path", "resources/config.json"],
-            "program": "${file}",
+            "args": ["-c", "Users/dpenney/Study/taskmaster_v3/resources/config.json"],
+            "program": "${file} -c Users/dpenney/Study/taskmaster_v3/resources/config.json",
             "console": "integratedTerminal",
             "justMyCode": true
         }

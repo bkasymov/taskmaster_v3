@@ -7,7 +7,11 @@ from concurrent.futures import ThreadPoolExecutor
 from constants import LOGLEVELCONSTANT, STATUS
 from logger import Logger
 
-def handle_process_restart_behavior(process, autorestart, exitcodes, restart_callback):
+def handle_process_restart_behavior(process,
+                                    autorestart,
+                                    exitcodes,
+                                    restart_callback):
+    
     process.wait()
 
     logger = Logger(level=LOGLEVELCONSTANT)
@@ -15,7 +19,8 @@ def handle_process_restart_behavior(process, autorestart, exitcodes, restart_cal
                  f'Expected exitcodes: {exitcodes}'
                  f'Autorestart: {autorestart}')
 
-    if autorestart.upper() == 'ALWAYS' or (autorestart.upper() == 'UNEXPECTED' and process.returncode not in exitcodes and '*' not in process.returncode):
+    if autorestart.upper() == 'ALWAYS' or (autorestart.upper() == 'UNEXPECTED' and
+                                           process.returncode not in exitcodes and '*' not in process.returncode):
         try:
             logger.debug(f'Process {process.pid} ({process.args}) will be restarted by callback %s.' % restart_callback.__name__)
             restart_callback(process)
@@ -47,7 +52,7 @@ class Task:
                workingdir=os.getcwd(),
                autostart=True,
                autorestart='unexpected',
-               exitcodes=[0],
+               exitcodes=None,
                startretries=1,
                starttime=5, # Задержка перед запуском
                stopsignal='TERM',
@@ -55,6 +60,8 @@ class Task:
                env = {},
                **kwargs):
 
+        if exitcodes is None:
+            exitcodes = [0]
         self.name = name
         self.cmd = cmd
         self.numprocs = numprocs
@@ -97,10 +104,7 @@ class Task:
         self.reopen_stds()
         self.log_start_attempt()
         self.start_processes()
-        # try:
-        #     self.start_processes()
-        # except Exception:
-        #     self.handle_startup_failure()
+
 
     def update_trynum(self, retry):
         if not retry:
@@ -198,6 +202,7 @@ class Task:
 
 
     @property
+
     def stdout(self):
         return self._stdout
 
@@ -206,14 +211,9 @@ class Task:
     def stdout(self, path):
         if not path:
             self._stdout = subprocess.PIPE
+            return
         else:
-            try:
-                with open(path, 'w') as file:
-                    self._stdout = file
-            except IOError:
-                self.logger.error(f'Can not open {path}')
-                print(f'Can not open {path}')
-                self._stdout = subprocess.PIPE
+            self._stdout = subprocess.PIPE
 
     @property
     def stderr(self):
@@ -223,14 +223,9 @@ class Task:
     def stderr(self, path):
         if not path:
             self._stderr = subprocess.PIPE
+            return
         else:
-            try:
-                with open(path, 'w') as file:
-                    self._stderr = file
-            except IOError:
-                self.logger.error(f'Can not open {path}')
-                print(f'Can not open {path}')
-                self._stderr = subprocess.PIPE
+            self._stderr = subprocess.PIPE
 
 #
     def _initchildproc(self):
@@ -264,7 +259,8 @@ class Task:
 
 
 
-
+# TODO следует разобраться до конца как работает стоп.
+    # FIXME узнать где from_thread True.
     def stop(self, from_thread=False):
         self.stopping = True
         self.close_fds()
@@ -275,17 +271,19 @@ class Task:
         self.threads = list()
         self.start_time = STATUS['STOPPED'] # Для того, чтобы при следующей проверке is_running процесс запускался заново
         self.stopping = False
+
     def _stop_processes(self):
         """Останавливает все процессы, связанные с задачей."""
         for process in self.processes:
-            self.log.info(f'Send SIG{self.stopsignal} to {process.pid}.')
+            self.logger.info(f'Send SIG{self.stopsignal} to {process.pid}.')
             process.send_signal(getattr(signal, 'SIG' + self.stopsignal))
 
             try:
                 process.wait(self.stoptime)
             except subprocess.TimeoutExpired:
-                self.log.info(f'Force kill {process.pid}.')
+                self.logger.info(f'Force kill {process.pid}.')
                 process.kill()
+
     def _stop_threads(self):
         """Waits for the completion of all threads, handling potential issues."""
         for thread in self.threads:
@@ -293,7 +291,11 @@ class Task:
 
             if thread.is_alive():
                 # Logging if the thread is still active after the waiting period
-                self.log.warning(f'Thread {thread.name} did not finish in time.')
+                self.logger.warning(f'Thread {thread.name} did not finish in time.')
+                thread.cancel()
+                thread.join()
+
+
 
 
 
