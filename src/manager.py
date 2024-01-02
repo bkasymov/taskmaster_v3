@@ -84,3 +84,4 @@ class Manager:
                 self._remove_program_by_name(program_name)
 
     # TODO next method for write is load_tcp_command
+    # TODO check all methods with write at the main method daemon.py
