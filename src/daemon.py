@@ -2,6 +2,7 @@ import copy
 import signal
 import sys
 from logger import Logger
+from manager import Manager
 from parse_configs import DaemonParser
 from exceptions import ConfigParserError
 from tasks import Task
@@ -65,8 +66,6 @@ if __name__ == '__main__':
     taskmaster_daemon = TaskmasterDaemon()
 
     taskmaster_daemon.parse_configs()
-
-    # task = Task("test", "sleep 10", stdout="/dev/null", stderr="/dev/null", autostart=True, autorestart=True)
 
     taskmaster_daemon.create_tasks()
 

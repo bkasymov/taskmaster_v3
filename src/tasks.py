@@ -125,7 +125,7 @@ class Task:
             self._stderr = subprocess.PIPE
             return
         else:
-            self._stderr = open(path, 'a')
+            self._stderr = open(path, 'w')
 
 
     def _initchildproc(self):
@@ -196,21 +196,19 @@ class Task:
         self.logger.info(f'Try to start {self.name}. Retry attempt {self.trynum}, max retries: {self.startretries}, cmd: `{self.cmd}`')
 
     def start_processes(self):
+        for virtual_pid in range(self.numprocs):
+            process = self.start_process(virtual_pid)
+            self.processes.append(process)
+            self.start_time = time.time()
 
-        try:
-            for virtual_pid in range(self.numprocs):
-                process = self.start_process(virtual_pid)
-                self.processes.append(process)
-                self.start_time = time.time()
+            if self.is_successful_start(process, virtual_pid):
+                continue
+            else:
+                self.handle_unsuccessful_start(process, virtual_pid)
 
-                if self.is_successful_start(process, virtual_pid):
-                    continue
-                else:
-                    self.handle_unsuccessful_start(process, virtual_pid)
-
-# TODO STOOPED HERE
     def start_process(self, virtual_pid):
-        result = subprocess.Popen(
+        try:
+            result = subprocess.Popen(
             self.cmd.split(),
             stderr=self.stderr,
             stdout=self.stdout,
@@ -218,7 +216,11 @@ class Task:
             cwd=self.workingdir,
             preexec_fn=self._initchildproc,
         )
-        return result
+            return result
+        except Exception as e:
+            self.logger.error(f'Error in {self.name} subprocess.Popen: {e}')
+            self.restart(retry=True)
+
 
     def is_successful_start(self, process, virtual_pid):
         if process.returncode in self.exitcodes:
@@ -232,7 +234,6 @@ class Task:
     def handle_unsuccessful_start(self, process, virtual_pid):
         try:
             process.wait(timeout=self.starttime)
-
             if self.is_successful_start(process, virtual_pid):
                 return
         except subprocess.TimeoutExpired:
