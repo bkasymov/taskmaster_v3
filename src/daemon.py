@@ -66,6 +66,8 @@ if __name__ == '__main__':
 
     taskmaster_daemon.parse_configs()
 
+    # task = Task("test", "sleep 10", stdout="/dev/null", stderr="/dev/null", autostart=True, autorestart=True)
+
     taskmaster_daemon.create_tasks()
 
     taskmaster_daemon.manager = Manager(taskmaster_daemon.programs, taskmaster_daemon.parser)

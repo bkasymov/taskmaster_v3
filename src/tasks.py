@@ -1,6 +1,7 @@
 import os
 import signal
 import subprocess
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 
@@ -33,30 +34,31 @@ def _nop():
 class Task:
     def __init__(self, *args, **kwargs):
         self.logger = Logger(level=LOGLEVELCONSTANT)
-        self.processes = []
+
+        self.processes = list()
         self.start_time = STATUS['NOT_STARTED']
-        self.stdout = ""    #FIXME here in process of set value return -1. Because Pycharm has not right to read and write /tmp/
-        self.stderr = ""
+        self.stdout = ''    #FIXME here in process of set value return -1. Because Pycharm has not right to read and write /tmp/
+        self.stderr = ''
         self.trynum = 1
         self.threads = list()
         self.stopping = False
 
         self.update(*args, **kwargs)
-        self.logger.debug("Task created")
+        self.logger.debug("Task has created")
 
     def update(self,
                name,
                cmd,
                numprocs=1,
-               umask='665',
+               umask='666',
                workingdir=os.getcwd(),
                autostart=True,
                autorestart='unexpected',
                exitcodes=[0],
-               startretries=1,
+               startretries=2,
                starttime=5, # Задержка перед запуском
                stopsignal='TERM',
-               stoptime=5, # Задержка перед остановкой
+               stoptime=10, # Задержка перед остановкой
                env={},
                **kwargs):
 
@@ -66,7 +68,7 @@ class Task:
         self.name = name
         self.cmd = cmd
         self.numprocs = numprocs
-        self.umask = umask
+        self.umask = str(umask) if isinstance(umask, int) else '666'
         self.workingdir = workingdir
         self.autostart = autostart
         self.autorestart = autorestart
@@ -80,7 +82,7 @@ class Task:
         for key, value in env.items():
             self.env[key] = str(value)
 
-        self.stdout = self.stdout + kwargs.get('stdout', '')
+        self.stdout = kwargs.get('stdout', '')
         self.stderr = kwargs.get('stderr', '')
 
         if autostart:
@@ -90,7 +92,78 @@ class Task:
                 self.run()
 
 
+    def close_fds(self):
+        getattr(self.stdout, 'close', _nop)()
+        getattr(self.stderr, 'close', _nop)()
 
+
+    def reopen_stds(self):
+        if getattr(self.stdout, 'closed', True):
+            self.stdout = getattr(self.stdout, 'name', '')
+        if getattr(self.stderr, 'closed', True):
+            self.stderr = getattr(self.stderr, 'name', '')
+
+    @property
+    def stdout(self):
+        return self._stdout
+
+    @stdout.setter
+    def stdout(self, path):
+        if not path:
+            self._stdout = subprocess.PIPE
+            return
+        else:
+            self._stdout = open(path, 'a')
+
+    @property
+    def stderr(self):
+        return self._stderr
+
+    @stderr.setter
+    def stderr(self, path):
+        if not path:
+            self._stderr = subprocess.PIPE
+            return
+        else:
+            self._stderr = open(path, 'a')
+
+
+    def _initchildproc(self):
+        """
+        Метод, который вызывается перед запуском дочернего процесса для того, чтобы изменить права доступа производных файлов и директорий.
+        Аргумент 8 означает, что права доступа будут установлены в 8-ричной системе счисления.
+        :return:
+        """
+        os.umask(int(self.umask, 8))
+
+    def restart(self, retry=False, from_thread=False):
+        """
+        Если метод вызывается из потока, то проверяется, не находится ли процесс в состоянии остановки.
+        Если да, то метод завершается.
+        :param retry:
+        :param from_thread:
+        :return:
+        """
+        if from_thread and self.stopping:
+            return
+
+        self.stop(from_thread)
+        self.run(retry=retry)
+
+    def define_restart_policy(self, process, retry=False):
+        thr = threading.Thread(
+            target=handle_process_restart_behavior,
+            args=(
+                process,
+                self.autorestart,
+                self.exitcodes,
+                lambda *_:
+                    self.restart(retry=retry, from_thread=True),
+            ),
+            daemon=True,
+        )
+        thr.start()
+        self.threads.append(thr)
 
 
     def run(self, retry=False):
@@ -123,16 +196,19 @@ class Task:
         self.logger.info(f'Try to start {self.name}. Retry attempt {self.trynum}, max retries: {self.startretries}, cmd: `{self.cmd}`')
 
     def start_processes(self):
-        for virtual_pid in range(self.numprocs):
-            process = self.start_process(virtual_pid)
-            self.processes.append(process)
-            self.start_time = time.time()
 
-            if self.is_successful_start(process, virtual_pid):
-                continue
-            else:
-                self.handle_unsuccessful_start(process, virtual_pid)
+        try:
+            for virtual_pid in range(self.numprocs):
+                process = self.start_process(virtual_pid)
+                self.processes.append(process)
+                self.start_time = time.time()
 
+                if self.is_successful_start(process, virtual_pid):
+                    continue
+                else:
+                    self.handle_unsuccessful_start(process, virtual_pid)
+
+# TODO STOOPED HERE
     def start_process(self, virtual_pid):
         result = subprocess.Popen(
             self.cmd.split(),
@@ -181,69 +257,13 @@ class Task:
             return self.start_time > 0
 
 
-    def restart(self, retry=False, from_thread=False):
-        """
-        Если метод вызывается из потока, то проверяется, не находится ли процесс в состоянии остановки.
-        Если да, то метод завершается.
-        :param retry:
-        :param from_thread:
-        :return:
-        """
-        if from_thread and self.stopping:
-            return
-
-        self.stop(from_thread)
-        self.run(retry=retry)
-
-    def reopen_stds(self):
-        if getattr(self.stdout, 'closed', True):
-            self.stdout = getattr(self.stdout, 'name', '')
-        if getattr(self.stderr, 'closed', True):
-            self.stderr = getattr(self.stderr, 'name', '')
 
 
-    @property
-
-    def stdout(self):
-        return self._stdout
 
 
-    @stdout.setter
-    def stdout(self, path):
-        if not path:
-            self._stdout = subprocess.PIPE
-            return
-        else:
-            self._stdout = subprocess.PIPE
-
-    @property
-    def stderr(self):
-        return self._stderr
-
-    @stderr.setter
-    def stderr(self, path):
-        if not path:
-            self._stderr = subprocess.PIPE
-            return
-        else:
-            self._stderr = subprocess.PIPE
-
-#
-    def _initchildproc(self):
-        """
-        Метод, который вызывается перед запуском дочернего процесса для того, чтобы изменить права доступа производных файлов и директорий.
-        аргумент 8 означает, что права доступа будут установлены в 8-ричной системе счисления.
-        :return:
-        """
-        os.umask(int(self.umask, 8))
 
 
-    def define_restart_policy(self, process, retry=False):
-        try:
-            with ThreadPoolExecutor(max_workers=1) as executor:
-                executor.submit(self._handle_restart, process, retry)
-        except Exception as e:
-            self.logger.error(f'Error in thread: {e}')
+
 
 
     def _handle_restart(self, process, retry):
@@ -260,8 +280,6 @@ class Task:
 
 
 
-# TODO следует разобраться до конца как работает стоп.
-    # FIXME узнать где from_thread True.
     def stop(self, from_thread=False):
         self.stopping = True
         self.close_fds()
@@ -302,9 +320,7 @@ class Task:
 
 # TODO ещё не все методы от файла task добавил. https://improved-dollop-4wx96vp4xpv2qrq6.github.dev/
 
-    def close_fds(self):
-        getattr(self.stdout, 'close', _nop)()
-        getattr(self.stderr, 'close', _nop)()
+
 
 
     def update_process_status(self):
