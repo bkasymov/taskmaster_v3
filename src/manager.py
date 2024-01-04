@@ -83,5 +83,79 @@ class Manager:
                 program.stop()
                 self._remove_program_by_name(program_name)
 
-    # TODO next method for write is load_tcp_command
     # TODO check all methods with write at the main method daemon.py
+
+    def load_tcp_command(self, request):
+        command = request.get('command', '').upper()
+        args = request.get('args', [])
+        with_refresh = request.get('with_refresh', False)
+
+        if command == 'UPDATE':
+            return self.handle_update(with_refresh)
+        if command == "REFRESH":
+            return self.handle_refresh(args)
+        if command == "STOP_DAEMON": # FIXME переименовать на stop_all
+            return self.handle_stop_daemon()
+        return self.handle_command(command, args, with_refresh)
+
+    def handle_update(self, with_refresh):
+        response = self.update()
+        if not with_refresh:
+            return response
+        return None
+
+    def handle_refresh(self, args):
+        if args:
+            return self.get_programs_status(args)
+        return self.get_programs_status()
+
+    def handle_stop_daemon(self):
+        self.stop_all()
+        raise Exception("Stop daemon")
+
+    def handle_command(self,
+                       command,
+                       args,
+                       with_refresh):
+        response = []
+
+        for program in self.programs:
+            if program.name in args:
+                ret = self.execute_command_on_program(program, command)
+                response.append(self.format_response(ret))
+                args.remove(program.name)
+        if not with_refresh:
+            return response
+        return self.get_programs_status()
+
+    def execute_command_on_program(self, program, command):
+        return program.send_command(command)
+
+    def format_response(self, ret):
+        if 'error' in ret:
+            return {
+                'raw_output': '{}: [ ERROR ] ({})'.format(ret['task'], ret['message']),
+                **ret
+            }
+        else:
+            return {
+                'raw_output': '{}: {}'.format(ret['task'], ret['message']),
+                **ret
+            }
+
+    def get_programs_status(self, args=None):
+        if args is None:
+            selected_programs = self.programs
+        else:
+            selected_programs = [program for program in self.programs if program.name in args]
+
+        status_list = []
+        for program in selected_programs:
+            program_status = {
+                "task": program.name,
+                "uptime": program.get_uptime(),
+                "started_processes": len(program.processes),
+                "pids": [process.pid for process in program.processes],
+            }
+            status_list.append(program_status)
+        return status_list

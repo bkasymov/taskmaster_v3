@@ -11,3 +11,5 @@ programs:
     cmd: "ls -R /"
     workingdir: /
     numprocs: 2
+    stderr: ./result/ls_root.err.log
+    stdout: ./result/ls_root.out.log

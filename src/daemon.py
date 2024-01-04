@@ -5,6 +5,8 @@ from logger import Logger
 from manager import Manager
 from parse_configs import DaemonParser
 from exceptions import ConfigParserError
+from server import Server
+
 from tasks import Task
 from constants import LOGLEVELCONSTANT
 
@@ -40,7 +42,7 @@ class TaskmasterDaemon:
     def setup_signal_handlers(self):
         def update_tcp_command(*_):
             self.manager.load_tcp_command({"command": "update"})
-        signal.signal(signal.SIGHUB, update_tcp_command)
+        signal.signal(signal.SIGHUP, update_tcp_command)
 
     def start_server(self):
         try:
@@ -72,7 +74,7 @@ if __name__ == '__main__':
     taskmaster_daemon.manager = Manager(taskmaster_daemon.programs, taskmaster_daemon.parser)
 
     taskmaster_daemon.setup_signal_handlers()
-
+# TODO class server is not available. Why? I don't know. I will fix it later.
     taskmaster_daemon.start_server()
 
     taskmaster_daemon.stop_all()
