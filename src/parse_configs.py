@@ -1,5 +1,6 @@
 import argparse
 
+from constants import LOGLEVELCONSTANT
 from exceptions import ParseError
 from logger import Logger
 import logging
@@ -7,8 +8,6 @@ import os
 import sys
 import yaml
 from params_validation import PARAMS_CONSTANTS, _no_check, _to_list
-
-LOGLEVELCONSTANT = getattr(logging, os.environ.get('LOGLEVEL', 'INFO'), logging.INFO)
 
 REQUIRED_PARAMS = ['cmd',]
 class DaemonParser:

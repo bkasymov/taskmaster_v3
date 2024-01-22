@@ -2,10 +2,9 @@ import copy
 import logging
 import os
 
+from constants import LOGLEVELCONSTANT
 from logger import Logger
 from tasks import Task
-
-LOGLEVEL = getattr(logging, os.environ.get('LOGLEVEL', 'INFO'), logging.INFO)
 
 class Manager:
     programs = list()
@@ -13,7 +12,7 @@ class Manager:
     def __init__(self, programs, parser):
         self.programs = programs
         self.parser = parser
-        self.logger = Logger(level=LOGLEVEL)
+        self.logger = Logger(level=LOGLEVELCONSTANT)
 
     def stop_all(self):
         for program in self.programs:

@@ -74,9 +74,10 @@ if __name__ == '__main__':
     taskmaster_daemon.manager = Manager(taskmaster_daemon.programs, taskmaster_daemon.parser)
 
     taskmaster_daemon.setup_signal_handlers()
-# TODO class server is not available. Why? I don't know. I will fix it later.
-    taskmaster_daemon.start_server()
-
+    
+    taskmaster_daemon.server = Server(taskmaster_daemon)
+    taskmaster_daemon.server.serve()
+    
     taskmaster_daemon.stop_all()
 
 

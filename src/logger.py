@@ -54,3 +54,7 @@ class Logger:
         if self.level > logging.DEBUG:
             return
         self._message(msg, level='debug', color=Termcolors.MAGT, bold=True, **kwargs)
+
+
+def info(param):
+    return None
