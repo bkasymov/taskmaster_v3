@@ -5,7 +5,7 @@ from threading import Lock
 from waitress import serve
 
 import logger
-from constants import LOGLEVELCONSTANT
+from constants import LOGLEVELCONSTANT, SERVER_PORT
 
 
 class Server:
@@ -47,4 +47,4 @@ class Server:
         return [json.dumps(response_data).encode()]
 
     def serve(self):
-        serve(self.application, listen='*:8080')
+        serve(self.application, listen=SERVER_PORT)
