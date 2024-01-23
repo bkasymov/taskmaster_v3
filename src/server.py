@@ -1,5 +1,6 @@
 import json
 import signal
+import sys
 from threading import Lock
 
 from waitress import serve
@@ -25,7 +26,9 @@ class Server:
         with self.lock:
             request_body = self._read_request_body(environ)
             response_data = self._process_request(request_body)
-            return self._create_response(start_response, response_data)
+            i = self._create_response(start_response, response_data)
+            return i
+        print("application")
 
     def _read_request_body(self, environ):
         try:
@@ -47,4 +50,8 @@ class Server:
         return [json.dumps(response_data).encode()]
 
     def serve(self):
-        serve(self.application, listen=SERVER_PORT)
+        try:
+            serve(self.application, listen=f'*:{SERVER_PORT}')
+        except KeyboardInterrupt:
+            self.logger.warning("Keyboard interrupt")
+            sys.exit(-1)

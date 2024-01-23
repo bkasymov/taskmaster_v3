@@ -37,7 +37,7 @@ class Task:
 
         self.processes = list()
         self.start_time = STATUS['NOT_STARTED']
-        self.stdout = ''    #FIXME here in process of set value return -1. Because Pycharm has not right to read and write /tmp/
+        self.stdout = ''
         self.stderr = ''
         self.trynum = 1
         self.threads = list()
@@ -52,7 +52,7 @@ class Task:
                numprocs=1,
                umask='666',
                workingdir=os.getcwd(),
-               autostart=True,
+               autostart=False,
                autorestart='unexpected',
                exitcodes=[0],
                startretries=2,
@@ -362,3 +362,6 @@ class Task:
         else:
             return 'Unknown command'
         return 'Command sent'
+    
+    def get_uptime(self):
+        return self.uptime()

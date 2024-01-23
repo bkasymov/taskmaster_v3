@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     taskmaster_daemon.setup_signal_handlers()
     
-    taskmaster_daemon.server = Server(taskmaster_daemon)
+    taskmaster_daemon.server = Server(manager=taskmaster_daemon.manager)
     taskmaster_daemon.server.serve()
     
     taskmaster_daemon.stop_all()
