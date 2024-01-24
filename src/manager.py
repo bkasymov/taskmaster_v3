@@ -131,18 +131,14 @@ class Manager:
         return program.send_command(command)
 
     def format_response(self, ret):
-        if isinstance(ret, str):
-            # If ret is a string, assume it's an error message
+        if 'error' in ret:
             return {
-                'raw_output': 'Unknown Task: [ ERROR ] ({})'.format(ret),
-                'error': True,
-                'message': ret
+                "raw_output": f"{ret['task']}: ERROR: {ret['message']}",
+                **ret
             }
         else:
-            # If ret is a dictionary, process it normally
-            error_message = '{}: [ ERROR ] ({})'.format(ret.get('task', 'Unknown Task'), ret.get('message', 'Unknown Message'))
             return {
-                'raw_output': error_message if 'error' in ret else '{}: {}'.format(ret.get('task', 'Unknown Task'), ret.get('message', 'Unknown Message')),
+                "raw_output": f"{ret['task']}: {ret['message']}",
                 **ret
             }
 

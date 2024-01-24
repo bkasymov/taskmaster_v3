@@ -195,6 +195,8 @@ class Task:
     def log_start_attempt(self):
         self.logger.info(f'Try to start {self.name}. Retry attempt {self.trynum}, max retries: {self.startretries}, cmd: `{self.cmd}`')
 
+
+# Program works correct byt does not return correct status
     def start_processes(self):
         for virtual_pid in range(self.numprocs):
             process = self.start_process(virtual_pid)
@@ -216,6 +218,7 @@ class Task:
             cwd=self.workingdir,
             preexec_fn=self._initchildproc,
         )
+            result.wait()
             return result
         except Exception as e:
             self.logger.error(f'Error in {self.name} subprocess.Popen: {e}')
@@ -353,15 +356,18 @@ class Task:
 
     def send_command(self, command):
         self.logger.info(f'Send command {command} to {self.name}')
-        if command.upper() == 'RESTART':
+        if command == 'RESTART':
             self.restart()
-        elif command == 'stop':
+        elif command == 'STOP':
             self.stop()
-        elif command == 'start':
+        elif command == 'START':
             self.run()
         else:
             return 'Unknown command'
-        return 'Command sent'
+        return {
+            'task': self.name,
+            'message': f'Command {command} has been sent.'
+        }
     
     def get_uptime(self):
         return self.uptime()

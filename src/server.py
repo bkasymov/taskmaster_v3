@@ -22,13 +22,17 @@ class Server:
         self.manager.stop_all()
         raise KeyboardInterrupt
 
+
+    # At first controller send command refresh, then server send client request
+
     def application(self, environ, start_response):
         with self.lock:
             request_body = self._read_request_body(environ)
             response_data = self._process_request(request_body)
+            # response_data = response_data.json.decode()
             i = self._create_response(start_response, response_data)
             return i
-        print("application")
+
 
     def _read_request_body(self, environ):
         try:

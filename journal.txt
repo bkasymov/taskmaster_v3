@@ -3,3 +3,16 @@
 и сеттеры. Оттуда эта беда и тянется, что -1 присваивает.
 Поэтому я решил полностью по каждому полю сызнова пройтись внимательно по тому
 как делали в гитхабе другие.
+Разбираюсь с ответом. Была ошибка в формате того, как ответ возвращался. Сейчас исправил. Теперь сервер не может получить корректный ответ. Почему?
+Ответ идёт в виде двойной сериализации. Следует проверить, чтобы такого не было.
+Почему то ответ приходит два раза. А не один раз. В словаре дважды ответ повторяется.
+
+Commands start, status, stop works.
+Command update doesn't work.
+Because in process of update should read config file again. But id doesn't.
+
+Command "restart" in process of resolving.
+Have a pause in process.
+
+Command "stop all" doesn't work.
+have not process regulation of command "stop all"
