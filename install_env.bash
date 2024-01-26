@@ -25,7 +25,9 @@ source $venv_name/bin/activate
 
 # Установка зависимостей из requirements.txt
 pip install -r requirements.txt
+pip install --upgrade pip
 
+mkdir result
 # Сообщение о завершении
 echo "Всё готово. Ваше виртуальное окружение активировано, и зависимости установлены."
 

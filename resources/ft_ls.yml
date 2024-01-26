@@ -8,7 +8,7 @@ programs:
     stderr: ./result/ls_reg.err.log
 
   ls_root:
-    cmd: "ls -R /"
+    cmd: "yes"
     workingdir: /
     numprocs: 2
     stderr: ./result/ls_root.err.log
