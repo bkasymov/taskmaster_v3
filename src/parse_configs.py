@@ -1,4 +1,5 @@
 import argparse
+import signal
 
 from constants import LOGLEVELCONSTANT
 from exceptions import ParseError
@@ -97,5 +98,36 @@ class DaemonParser:
         args = parser.parse_args()
         return cls(args.config_path)
 
+
+    def _get_difference(self, old_config, new_config):
+        old_conf_set = set(old_config.keys())
+        new_conf_set = set(new_config.keys())
+        unique_keys = old_conf_set.symmetric_difference(new_conf_set)
+        
+        diff_set = set()
+        
+        common_keys = old_conf_set.intersection(new_conf_set)
+        
+        for key in common_keys:
+            if old_config[key] != new_config[key]:
+                diff_set.add(key)
+        
+        diff = unique_keys.union(diff_set)
+        
+        return list(diff)
+    
+    
+    def refresh(self):
+        daemon_parser = None
+        try:
+            daemon_parser = DaemonParser(self.config_path)
+        except ParseError:
+            self.logger.error("Error parsing config file")
+            os.kill(os.getpid(), signal.SIGKILL)
+        diff_list = self._get_difference(self.config['programs'], daemon_parser.config['programs'])
+        self.config = daemon_parser.config
+        return diff_list
+    
+        
 if __name__ == '__main__':
     daemon_parser = DaemonParser().from_command_line()

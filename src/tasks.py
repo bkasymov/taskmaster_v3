@@ -218,7 +218,6 @@ class Task:
             cwd=self.workingdir,
             preexec_fn=self._initchildproc,
         )
-            result.wait()
             return result
         except Exception as e:
             self.logger.error(f'Error in {self.name} subprocess.Popen: {e}')
@@ -306,23 +305,17 @@ class Task:
             except subprocess.TimeoutExpired:
                 self.logger.info(f'Force kill {process.pid}.')
                 process.kill()
-
+    
     def _stop_threads(self):
         """Waits for the completion of all threads, handling potential issues."""
         for thread in self.threads:
-            thread.join(1)  # Increasing the wait time to 1 second
+            thread.join(1)
 
             if thread.is_alive():
                 # Logging if the thread is still active after the waiting period
                 self.logger.warning(f'Thread {thread.name} did not finish in time.')
-                thread.cancel()
-                thread.join()
 
-
-
-
-
-# TODO ещё не все методы от файла task добавил. https://improved-dollop-4wx96vp4xpv2qrq6.github.dev/
+    # TODO ещё не все методы от файла task добавил. https://improved-dollop-4wx96vp4xpv2qrq6.github.dev/
 
 
 

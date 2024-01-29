@@ -37,7 +37,7 @@ def _int_checker(integer, min_val, max_val):
 
 
 def _umask_checker(umask):
-    umask_str = str(umask)
+    umask_str = umask
 
     if len(umask_str) != 3:
         return False, 'Umask must be a 3-digit number.'
@@ -82,7 +82,6 @@ def _to_list(item):
 
 
 def _no_check(*args):
-    print('Проверь этот кейс!!!')
     return True, ''
 
 def _create_path_if_not_exitsts(path):

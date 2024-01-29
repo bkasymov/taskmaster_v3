@@ -14,5 +14,23 @@ Because in process of update should read config file again. But id doesn't.
 Command "restart" in process of resolving.
 Have a pause in process.
 
+
 Command "stop all" doesn't work.
 have not process regulation of command "stop all"
+
+With argument 'yes' works bad. Why? Because can't to catch this case?
+
+When stop process, have problem:
+  File "/Users/dpenney/Study/taskmaster_v3/src/tasks.py", line 24, in handle_process_restart_behavior
+    process.returncode not in exitcodes and '*' not in process.returncode):
+TypeError: argument of type 'int' is not iterable
+
+update command doesn't work.  because DaemonParser refresh command doesn't work. This command should
+to update configuration file.
+Update command works when you add new program and delete old program.
+
+! threads have a problem, because is process when you stop it, logs said thread have not "stop" method.
+
+stop all works correctly. But response does not work correctly.
+Taskmaster controller does not print response from server correctly.
+But in deamon it logs correctly.

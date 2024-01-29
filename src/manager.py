@@ -39,10 +39,10 @@ class Manager:
         self.logger.info("Updating programs")
         difference = self.parser.refresh()
         self.logger.info("Difference: {}".format(difference))
-
-        self._update_existing_programs(difference)
-        self._add_new_programs(difference)
-        self._stop_and_remove_unaffected_programs(difference)
+        if difference:
+            self._update_existing_programs(difference)
+            self._add_new_programs(difference)
+            self._stop_and_remove_unaffected_programs(difference)
 
         return {"raw_output": "Updated tasks %s" % difference, "updated_tasks": difference}
 
@@ -50,7 +50,7 @@ class Manager:
         programs_names = [program.name for program in self.programs]
         changed_programs = []
 
-        for program_name, _program_params in self.parser.configuration.get('programs', {}).items():
+        for program_name, _program_params in self.parser.config.get('programs', {}).items():
             if program_name in programs_names:
                 program_params = copy.deepcopy(_program_params)
                 cmd = program_params.pop('cmd')
@@ -65,7 +65,7 @@ class Manager:
     def _add_new_programs(self, diff):
         programs_names = [program.name for program in self.programs]
 
-        for program_name, _program_params in self.parser.configuration.get('programs', {}).items():
+        for program_name, _program_params in self.parser.config.get('programs', {}).items():
             if program_name not in programs_names:
                 program_params = copy.deepcopy(_program_params)
                 cmd = program_params.pop('cmd')
@@ -74,10 +74,10 @@ class Manager:
 
     def _stop_and_remove_unaffected_programs(self, diff):
         programs_names = [program.name for program in self.programs]
-        affected = [program_name for program_name, _ in self.parser.configuration.get('programs', {}).items()]
-
+        affected = [program_name for program_name, _ in self.parser.config.get('programs', {}).items()]
+# FIXME should remove echo program, but he miss it.
         for program_name in programs_names:
-            if program_name not in diff and program_name not in affected:
+            if program_name in diff and program_name not in affected:
                 program = self._get_program_by_name(program_name)
                 program.stop()
                 self._remove_program_by_name(program_name)
@@ -93,7 +93,7 @@ class Manager:
             return self.handle_update(with_refresh)
         if command == "REFRESH":
             return self.handle_refresh(args)
-        if command == "STOP_DAEMON": # FIXME переименовать на stop_all
+        if command == "STOP DAEMON": # FIXME переименовать на stop_all
             return self.handle_stop_daemon()
         return self.handle_command(command, args, with_refresh)
 
@@ -117,6 +117,12 @@ class Manager:
                        args,
                        with_refresh):
         response = []
+
+        if args[0] == 'all' and command == 'STOP':
+            for program in self.programs:
+                ret = self.execute_command_on_program(program, command)
+                response.append(self.format_response(ret))
+            return self.get_programs_status()
 
         for program in self.programs:
             if program.name in args:

@@ -1,51 +1,42 @@
-programs
-  ping:
-    command: "ping google.com"
+programs:
+  ping_google:
+    cmd: "ping google.com"
     numprocs: 2
     autostart: true
-    restart_policy: "unexpected"
+    autorestart: "unexpected"
     exitcodes: [0]
-    successful_start_time: 5
-    max_restarts: 2
-    stop_signal: 15  # SIGTERM
-    graceful_stop_timeout: 5
-    stdout: "result/ping_service_out.log"
-    stderr: "result/ping_service_err.log"
-    env:
-      PING_COUNT: "4"
-    working_dir: "/tmp"
-    umask: 0o22
+    startretries: 3
+    stopsignal: "TERM"
+    stoptime: 10
+    stdout: "result/ping_google_out.log"
+    stderr: "result/ping_google_err.log"
+    workingdir: "/tmp"
+    umask: 0o022
 
-  ping_service2:
-    command: "ping google.com"
+  ls_home:
+    cmd: "ls -la /home"
     numprocs: 1
     autostart: false
-    restart_policy: "unexpected"
+    autorestart: "always"
     exitcodes: [0]
-    successful_start_time: 5
-    max_restarts: 2
-    stop_signal: 15  # SIGTERM
-    graceful_stop_timeout: 5
-    stdout: "result/ping_service_out.log"
-    stderr: "result/ping_service_err.log"
-    env:
-      PING_COUNT: "4"
-    working_dir: "/tmp"
-    umask: 0o22
+    startretries: 2
+    stopsignal: "TERM"
+    stoptime: 5
+    stdout: "result/ls_home_out.log"
+    stderr: "result/ls_home_err.log"
+    workingdir: "/home"
+    umask: 0o022
 
-  ls_service:
-    command: "ls -la"
+  curl_example:
+    cmd: "curl example.com"
     numprocs: 1
-    autostart: false
-    restart_policy: "unexpected"
+    autostart: true
+    autorestart: "never"
     exitcodes: [0]
-    successful_start_time: 5
-    max_restarts: 2
-    stop_signal: 15  # SIGTERM
-    graceful_stop_timeout: 5
-    stdout: "result/ls_service_out.log"
-    stderr: "result/ls_service_err.log"
-    env:
-      LS_OPTIONS: "-la"
-    working_dir: "/tmp"
-    umask: 0o22
+    startretries: 1
+    stopsignal: "TERM"
+    stoptime: 5
+    stdout: "result/curl_example_out.log"
+    stderr: "result/curl_example_err.log"
+    workingdir: "/tmp"
+    umask: 0o022
