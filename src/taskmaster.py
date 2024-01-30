@@ -4,9 +4,9 @@ import json
 from turtle import pd
 from urllib import request
 
-import constants
+import aa_constants
 
-SERVER_PORT = constants.SERVER_PORT
+SERVER_PORT = aa_constants.SERVER_PORT
 HEADERS = {'content-type': 'application/json'}
 
 class TaskMaster:

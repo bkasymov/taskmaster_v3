@@ -93,7 +93,7 @@ def _create_path_if_not_exitsts(path):
 PARAMS_CONSTANTS = {
     "cmd": {"expected_type": str, "handler": _command_checker},
     "numprocs": {"expected_type": int, "handler": _int_checker, "args": (1, 20)},
-    "umask": {"expected_type": int, "handler": _umask_checker},
+    "umask": {"expected_type": str, "handler": _umask_checker},
     "workingdir": {"expected_type": str, "handler": _path_checker},
     "autostart": {"expected_type": bool},
     "autorestart": {"expected_type": str, "handler": _str_checker, "args": ('ALWAYS', 'NEVER', 'UNEXPECTED')},

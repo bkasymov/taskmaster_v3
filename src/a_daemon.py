@@ -2,13 +2,13 @@ import copy
 import signal
 import sys
 from logger import Logger
-from manager import Manager
-from parse_configs import DaemonParser
+from e_manager import Manager
+from b_parse_configs import DaemonParser
 from exceptions import ConfigParserError
-from server import Server
+from f_server import Server
 
-from tasks import Task
-from constants import LOGLEVELCONSTANT
+from d_program import Task
+from aa_constants import LOGLEVELCONSTANT
 
 
 class TaskmasterDaemon:

@@ -5,7 +5,7 @@ import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-from constants import LOGLEVELCONSTANT, STATUS
+from aa_constants import LOGLEVELCONSTANT, STATUS
 from logger import Logger
 
 def handle_process_restart_behavior(process,
@@ -19,7 +19,10 @@ def handle_process_restart_behavior(process,
     logger.debug(f'Process {process.pid} ({process.args}) exited with returncode {process.returncode}.'
                  f'Expected exitcodes: {exitcodes}'
                  f'Autorestart: {autorestart}')
-
+    if process.returncode == -signal.SIGTERM or process.returncode == -signal.SIGKILL:
+        logger.debug(f'Process {process.pid} ({process.args}) was killed by signal {process.returncode}.')
+        restart_callback(process)
+        return
     if autorestart.upper() == 'ALWAYS' or (autorestart.upper() == 'UNEXPECTED' and
                                            process.returncode not in exitcodes and '*' not in process.returncode):
         try:
@@ -50,7 +53,7 @@ class Task:
                name,
                cmd,
                numprocs=1,
-               umask='666',
+               umask='022',
                workingdir=os.getcwd(),
                autostart=False,
                autorestart='unexpected',
@@ -68,7 +71,7 @@ class Task:
         self.name = name
         self.cmd = cmd
         self.numprocs = numprocs
-        self.umask = str(umask) if isinstance(umask, int) else '666'
+        self.umask = umask
         self.workingdir = workingdir
         self.autostart = autostart
         self.autorestart = autorestart
@@ -209,6 +212,7 @@ class Task:
                 self.handle_unsuccessful_start(process, virtual_pid)
 
     def start_process(self, virtual_pid):
+        umask_value = self._initchildproc()
         try:
             result = subprocess.Popen(
             self.cmd.split(),
@@ -216,7 +220,7 @@ class Task:
             stdout=self.stdout,
             env=self.env,
             cwd=self.workingdir,
-            preexec_fn=self._initchildproc,
+            preexec_fn=umask_value,
         )
             return result
         except Exception as e:

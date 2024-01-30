@@ -6,7 +6,7 @@ from threading import Lock
 from waitress import serve
 
 import logger
-from constants import LOGLEVELCONSTANT, SERVER_PORT
+from aa_constants import LOGLEVELCONSTANT, SERVER_PORT
 
 
 class Server:

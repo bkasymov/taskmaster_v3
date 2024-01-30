@@ -1,14 +1,14 @@
 import argparse
 import signal
 
-from constants import LOGLEVELCONSTANT
+from aa_constants import LOGLEVELCONSTANT
 from exceptions import ParseError
 from logger import Logger
 import logging
 import os
 import sys
 import yaml
-from params_validation import PARAMS_CONSTANTS, _no_check, _to_list
+from c_params_validation import PARAMS_CONSTANTS, _no_check, _to_list
 
 REQUIRED_PARAMS = ['cmd',]
 class DaemonParser:

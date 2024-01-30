@@ -2,9 +2,9 @@ import copy
 import logging
 import os
 
-from constants import LOGLEVELCONSTANT
+from aa_constants import LOGLEVELCONSTANT
 from logger import Logger
-from tasks import Task
+from d_program import Task
 
 class Manager:
     programs = list()
@@ -93,7 +93,7 @@ class Manager:
             return self.handle_update(with_refresh)
         if command == "REFRESH":
             return self.handle_refresh(args)
-        if command == "STOP DAEMON": # FIXME переименовать на stop_all
+        if command == "STOP_DAEMON":
             return self.handle_stop_daemon()
         return self.handle_command(command, args, with_refresh)
 
@@ -117,6 +117,7 @@ class Manager:
                        args,
                        with_refresh):
         response = []
+
 
         if args[0] == 'all' and command == 'STOP':
             for program in self.programs:

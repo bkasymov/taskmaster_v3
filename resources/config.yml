@@ -1,17 +1,17 @@
 programs:
   ping_google:
-    cmd: "ping google.com"
-    numprocs: 2
+    cmd: "ping google.com -c 5"
+    numprocs: 1
     autostart: true
     autorestart: "unexpected"
     exitcodes: [0]
-    startretries: 3
+    startretries: 2
     stopsignal: "TERM"
     stoptime: 10
     stdout: "result/ping_google_out.log"
     stderr: "result/ping_google_err.log"
     workingdir: "/tmp"
-    umask: 0o022
+    umask: "000"
 
   ls_home:
     cmd: "ls -la /home"
@@ -25,7 +25,7 @@ programs:
     stdout: "result/ls_home_out.log"
     stderr: "result/ls_home_err.log"
     workingdir: "/home"
-    umask: 0o022
+    umask: "022"
 
   curl_example:
     cmd: "curl example.com"
@@ -39,4 +39,4 @@ programs:
     stdout: "result/curl_example_out.log"
     stderr: "result/curl_example_err.log"
     workingdir: "/tmp"
-    umask: 0o022
+    umask: "022"
