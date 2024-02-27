@@ -1,5 +1,4 @@
-Name: complex
-
+name: complex
 on:
   push:
     branches:
