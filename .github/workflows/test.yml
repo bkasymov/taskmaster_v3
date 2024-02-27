@@ -4,15 +4,15 @@ on:
     branches:
       - main
 jobs:
-  test_ubuntu:
+  ubuntu:
     runs-on: windows:latest
     steps:
     - run: date
-  test_windows:
+  windows:
     runs-on: windows:latest
     steps:
     - run: date
-  test_macos:
+  macos:
     runs-on: macos-latest
     steps:
     - run: date
