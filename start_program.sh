@@ -1,2 +1,2 @@
 mkdir result
-python src/daemon.py -c resources/ft_ls.yml
+python src/a_daemon.py -c resources/ft_ls.yml
