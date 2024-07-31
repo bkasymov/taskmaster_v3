@@ -255,21 +255,9 @@ class Task:
         self.restart(retry=True)
 
 
-
-
-
-
     @property
     def is_running(self):
             return self.start_time > 0
-
-
-
-
-
-
-
-
 
 
 

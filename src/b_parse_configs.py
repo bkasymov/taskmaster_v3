@@ -4,7 +4,6 @@ import signal
 from aa_constants import LOGLEVELCONSTANT
 from exceptions import ParseError
 from logger import Logger
-import logging
 import os
 import sys
 import yaml
@@ -20,7 +19,6 @@ class DaemonParser:
             print('')
             self.logger.error("Config file not found %s" % self.config_path)
             sys.exit(-1)
-
         try:
             with open(self.config_path, 'r') as f:
                 self.config = yaml.load(f, Loader=yaml.FullLoader)
@@ -127,7 +125,3 @@ class DaemonParser:
         diff_list = self._get_difference(self.config['programs'], daemon_parser.config['programs'])
         self.config = daemon_parser.config
         return diff_list
-    
-        
-if __name__ == '__main__':
-    daemon_parser = DaemonParser().from_command_line()
