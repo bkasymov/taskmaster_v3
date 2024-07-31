@@ -13,7 +13,16 @@ from c_params_validation import PARAMS_CONSTANTS, _no_check, _to_list
 REQUIRED_PARAMS = ['cmd',]
 class DaemonParser:
     def __init__(self, config_path):
-        self.config_path = config_path
+        parser = argparse.ArgumentParser(description="Config file")
+        parser.add_argument(
+            '--config_path',
+            '-c',
+            required=True,
+            type=str,
+            help="Path to config file"
+        )
+        args = parser.parse_args()
+        self.config_path = args.config_path
         self.logger = Logger(level=LOGLEVELCONSTANT)
 
         if not os.path.exists(self.config_path):
@@ -85,18 +94,18 @@ class DaemonParser:
         if transform:
             self.config['programs'][program_name][param_key] = transform(param_value, *args)
 
-    @classmethod
-    def from_command_line(cls):
-        parser = argparse.ArgumentParser(description="Config file")
-        parser.add_argument(
-            '--config_path',
-            '-c',
-            required=True,
-            type=str,
-            help="Path to config file"
-        )
-        args = parser.parse_args()
-        return cls(args.config_path)
+    # @classmethod
+    # def from_command_line(cls):
+    #     parser = argparse.ArgumentParser(description="Config file")
+    #     parser.add_argument(
+    #         '--config_path',
+    #         '-c',
+    #         required=True,
+    #         type=str,
+    #         help="Path to config file"
+    #     )
+    #     args = parser.parse_args()
+    #     return cls(args.config_path)
 
 
     def _get_difference(self, old_config, new_config):

@@ -23,8 +23,9 @@ class TaskmasterDaemon:
         try:
             self.logger.info("Parsing config file")
             # Сначала вызывается статический метод, а затем создаётся объект DaemonParser сразу же.
+            # В результате в self.parser записывается объект класса DaemonParser
             # Возвращается объект класса DaemonParser
-            self.parser = DaemonParser.from_command_line()
+            self.parser = DaemonParser
             self.logger.info("Config file parsed")
             self.logger.success('')
         except ConfigParserError as e:
